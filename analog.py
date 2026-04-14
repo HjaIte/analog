@@ -43,38 +43,66 @@ def butterwoth(AB_0, P1, P2):
     sum_sys = -np.sqrt(2)*omega_0
     return(LP, omega_0, pp1, pp2, sum_sling, sum_sys)
 
-def rlocus(pp1, pp2):
-    # -- NY RAD 1: Skapa en stor, kvadratisk figur (10x10 tum) direkt --
-    plt.figure(figsize=(10, 10)) 
+def rlocus(P1, P2, pp1, pp2):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 14))
 
-    den = np.real(np.poly([pp1, pp2]))
-    num = [1]
-    sys = ct.tf(num, den)
+    #----------------------------ROOOT LOCUS UTNA FANTOMNOLLAN--------------------------
+    radius = abs(2.11e+05)
+
+    theta = np.linspace(0, 2 * np.pi, 300)
+
+    den = np.real(np.poly([P1, P2]))
+    num1 = [1]
+    sys1 = ct.tf(num1, den)
 
     K_required = 0.0
 
-    ct.root_locus_plot(sys)
-    
-    radius = abs(pp1)
 
-    theta = np.linspace(0, 2 * np.pi, 300)
-    plt.plot(radius * np.cos(theta), radius * np.sin(theta), 
+    ct.root_locus_plot(sys1, ax=ax1)
+
+    ax1.plot([0, np.real(P1)], [0, np.imag(P1)], 'g:', linewidth=0.8, alpha=0.6)
+    ax1.plot([0, np.real(P2)], [0, np.imag(P2)], 'g:', linewidth=0.8, alpha=0.6)
+
+    ax1.plot(np.real(P1), np.imag(P1), 'g*', markersize=14,
+            label=f"Butterworth target (K ≈ {K_required:.2f})")
+    ax1.plot(np.real(P2), np.imag(P2), 'g*', markersize=14)
+
+
+    ax1.grid(True, linestyle='--')
+    #-----------------------------------ROOT LOCUS FÖR FANTIOMNOLLAN-------------------------------
+
+    den = np.real(np.poly([pp1, pp2]))
+    nph = 144960.6
+    phzero = [1/nph, 1]
+    sys2 = ct.tf(phzero, den)
+
+    K_required = 0.0
+
+    ct.root_locus_plot(sys2, ax=ax2)
+
+    #plotta slingpolerna:
+
+    ax2.plot([0, np.real(P1)], [0, np.imag(P1)], 'g:', linewidth=0.8, alpha=0.6)
+    ax2.plot([0, np.real(P2)], [0, np.imag(P2)], 'g:', linewidth=0.8, alpha=0.6)
+
+    ax2.plot(np.real(P1), np.imag(P1), 'g*', markersize=14,
+            label=f"Butterworth target (K ≈ {K_required:.2f})")
+    ax2.plot(np.real(P2), np.imag(P2), 'g*', markersize=14)
+
+
+    #plotta systempolerna
+    ax2.plot(radius * np.cos(theta), radius * np.sin(theta), 
             'b--', linewidth=1, alpha=0.5, label=f"ω₀ = {radius:.2e} rad/s")
 
-    plt.plot([0, np.real(pp1)], [0, np.imag(pp1)], 'g:', linewidth=0.8, alpha=0.6)
-    plt.plot([0, np.real(pp2)], [0, np.imag(pp2)], 'g:', linewidth=0.8, alpha=0.6)
+    ax2.plot([0, np.real(pp1)], [0, np.imag(pp1)], 'g:', linewidth=0.8, alpha=0.6)
+    ax2.plot([0, np.real(pp2)], [0, np.imag(pp2)], 'g:', linewidth=0.8, alpha=0.6)
 
-    plt.plot(np.real(pp1), np.imag(pp1), 'g*', markersize=14,
+    ax2.plot(np.real(pp1), np.imag(pp1), 'g*', markersize=14,
             label=f"Butterworth target (K ≈ {K_required:.2f})")
-    plt.plot(np.real(pp2), np.imag(pp2), 'g*', markersize=14)
+    ax2.plot(np.real(pp2), np.imag(pp2), 'g*', markersize=14)
 
-    plt.gca().set_aspect('equal', adjustable='box')
-
-    plt.grid(True, linestyle='--')
-    
-    # -- NY RAD 2: Klipp bort onödiga vita marginaler --
-    plt.tight_layout()
-    
+    ax2.grid(True, linestyle='--')
+    ax2.set_xlim([-3.25*10**5, 2000])
     plt.show()
 
 def main():
@@ -92,7 +120,7 @@ def main():
         print("=> Endast domminata poler ingår")
     else:
         print("Icke-dominata poler ingår")
-    rlocus(pp1, pp2)
+    rlocus(P1, P2, pp1, pp2)
     
     print("_"*100)
 
