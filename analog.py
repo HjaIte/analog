@@ -18,6 +18,7 @@ I_C = 3.5e-3
 def r_pi_calc(B_f,I_C,V_T):
     #Values to calc r_pi
     r_pi = B_f*V_T/I_C
+    print(r_pi)
     return r_pi
 
 def value_AB_0(r_pi1, B_f, R_s, R_1, R_2):
@@ -28,14 +29,14 @@ def value_AB_0(r_pi1, B_f, R_s, R_1, R_2):
 
     return AB_0
 
-def P1_value(r_pi1, C_1):
-    return(-1/(r_pi1 * C_1))
+def P1_value(r_pi2, C_2):
+    return(-1/(r_pi2 * C_2))
 
 def P2_value(r_pi1, R_1, R_2, R_s, C_1):
     return (-((R_1 + R_2)*(R_s + r_pi1) + R_s*r_pi1)/(R_s*r_pi1*(R_1 + R_s)*C_1))
 
 def butterwoth(AB_0, P1, P2):
-    LP = abs((1 - AB_0) * P1 * P2)
+    LP = abs((1 - AB_0 * P1 * P2))
     omega_0 = np.sqrt(LP)
     pp1 = -omega_0 * (1/(np.sqrt(2)) + 1j/(np.sqrt(2)))
     pp2 = -omega_0 * (1/(np.sqrt(2)) - 1j/(np.sqrt(2)))
@@ -106,9 +107,10 @@ def rlocus(P1, P2, pp1, pp2):
     plt.show()
 
 def main():
-    r_pi1 = 2*r_pi_calc(B_f, I_C, V_T)
+    r_pi1 = 2 * r_pi_calc(B_f, I_C, V_T)
     AB_0 = value_AB_0(r_pi1, B_f, R_s, R_1, R_2)
-    P1 = P1_value(r_pi1, C_1)
+    r_pi2 = r_pi_calc(B_f, 3e-3, V_T)
+    P1 = P1_value(r_pi2, C_2)
     P2 = P2_value(r_pi1, R_1, R_2, R_s, C_1)
     LP, omega_0, pp1, pp2, sum_sling, sum_sys = butterwoth(AB_0, P1, P2)
     print("_"*100)
