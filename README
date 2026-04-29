@@ -1,2 +1,2 @@
-Kom ihåg att ladda ner python bib:
-pip install numpy matplotlib control
+Kom ihåg att ladda ner python libs finns i requirements.txt:
+För att återskapa miljön kör: pip install -r requirements.txt
