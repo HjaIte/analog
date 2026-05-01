@@ -115,7 +115,7 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
     P_ph = P_ph / norm_factor
     #Överföringsfunktioner:
     K_uncomp = AB_0 * P1 * P2
-    sys_Abeta_u = signal.ZerosPolesGain([], [-P1, -P2], K_uncomp).to_tf()
+    sys_Abeta_u = signal.ZerosPolesGain([], [P1, P2], K_uncomp).to_tf()
 
     #Sluten överföring
     num_At_u = At_inf * sys_Abeta_u.num #Täljare
@@ -123,8 +123,8 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
     sys_At_u = signal.TransferFunction(num_At_u, den_At_u) #Skapa överförningfunk med signal
 
     #Kompenserade överförningsfunk
-    K_comp = K_uncomp / P_ph
-    sys_Abeta_c = signal.ZerosPolesGain([-P_ph], [-P1, -P2], K_comp).to_tf()
+    K_comp = np.abs(K_uncomp / P_ph)
+    sys_Abeta_c = signal.ZerosPolesGain([P_ph], [P1, P2], K_comp).to_tf()
 
     num_At_c = At_inf * sys_Abeta_c.num #Täljare
     den_At_c = np.polyadd(sys_Abeta_c.den, sys_Abeta_c.num) #Nämnare
@@ -172,7 +172,7 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
     ax3.legend()
 
 # --- Stegsvar ---
-    t_vec = np.linspace(0, 0.0005, 1000) # 0.5 ms tidsfönster
+    t_vec = np.linspace(0, 1000, 1000) # 0.5 ms tidsfönster
     t_u, y_u = signal.step(sys_At_u, T=t_vec)
     t_c, y_c = signal.step(sys_At_c, T=t_vec)
 
@@ -188,6 +188,9 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
 
     plt.tight_layout()
     plt.show()
+    print("--- OKOMPENSERAT SYSTEM ---")
+    print("Täljare:", sys_At_u.num)
+    print("Nämnare:", sys_At_u.den)
     
 
 def main():
@@ -211,6 +214,6 @@ def main():
     rlocus(P1, P2, pp1, pp2)
     
     print("_"*100)
-    bode(AB_0, At_inf, P1, P2, Z_ph)
+    bode(-AB_0, At_inf, P1, P2, Z_ph)
 
 main()
