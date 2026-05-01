@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import control as ct
+import scipy.signal as signal
 
 #Komponeter:
 B_f = 200
@@ -18,7 +19,6 @@ I_C = 3.5e-3
 def r_pi_calc(B_f,I_C,V_T):
     #Values to calc r_pi
     r_pi = B_f*V_T/I_C
-    print(r_pi)
     return r_pi
 
 def value_AB_0(r_pi1, B_f, R_s, R_1, R_2):
@@ -106,13 +106,95 @@ def rlocus(P1, P2, pp1, pp2):
     ax2.set_xlim([-3.25*10**5, 2000])
     plt.show()
 
+
+    #################### BODE_DIAGRAM #########################
+def bode(AB_0, At_inf, P1, P2, P_ph):
+    #Överföringsfunktioner:
+    K_uncomp = AB_0 * P1 * P2
+    sys_Abeta_u = signal.ZerosPolesGain([], [-P1, -P2], K_uncomp).to_tf()
+
+    #Sluten överföring
+    num_At_u = At_inf * sys_Abeta_u.num #Täljare
+    den_At_u = np.polyadd(sys_Abeta_u.den, sys_Abeta_u.num) #Nämnare
+    sys_At_u = signal.TransferFunction(num_At_u, den_At_u) #Skapa överförningfunk med signal
+
+    #Kompenserade överförningsfunk
+    K_comp = K_uncomp / P_ph
+    sys_Abeta_c = signal.ZerosPolesGain([-P_ph], [-P1, -P2], K_comp).to_tf()
+
+    num_At_c = At_inf * sys_Abeta_c.num #Täljare
+    den_At_c = np.polyadd(sys_Abeta_c.den, sys_Abeta_c.num) #Nämnare
+    sys_At_c = signal.TransferFunction(num_At_c, den_At_c) #Skapa funk med signal
+
+    w_bode = np.logspace(1, 7, 1000) * 2 * np.pi 
+
+    fig = plt.figure(figsize=(14, 10))
+
+    w_u, mag_u, phase_u = signal.bode(sys_Abeta_u, w=w_bode)
+    w_c, mag_c, phase_c = signal.bode(sys_Abeta_c, w=w_bode)
+    f_hz = w_u / (2 * np.pi)
+
+    ax1 = plt.subplot(2, 2, 1)
+    ax1.semilogx(f_hz, mag_u, label='Okompenserad', linestyle='--')
+    ax1.semilogx(f_hz, mag_c, label='Kompenserad (Fantomnolla)')
+    ax1.axhline(0, color='black', linewidth=0.8, linestyle=':')
+    ax1.set_title(r'Bode Amplitud: Slingförstärkning $A\beta(s)$')
+    ax1.set_ylabel('Amplitud [dB]')
+    ax1.grid(True, which="both", ls="-", alpha=0.5)
+    ax1.legend()
+
+    ax2 = plt.subplot(2, 2, 3)
+    ax2.semilogx(f_hz, phase_u, label='Okompenserad', linestyle='--')
+    ax2.semilogx(f_hz, phase_c, label='Kompenserad')
+    ax2.axhline(-180, color='red', linewidth=0.8, linestyle=':')
+    ax2.set_title(r'Bode Fas: Slingförstärkning $A\beta(s)$')
+    ax2.set_xlabel('Frekvens [Hz]')
+    ax2.set_ylabel('Fas [Grader]')
+    ax2.grid(True, which="both", ls="-", alpha=0.5)
+
+    # --- Bode-diagram: Sluten förstärkning At(s) ---
+    w_At_u, mag_At_u, _ = signal.bode(sys_At_u, w=w_bode)
+    w_At_c, mag_At_c, _ = signal.bode(sys_At_c, w=w_bode)
+
+    ax3 = plt.subplot(2, 2, 2)
+    ax3.semilogx(f_hz, mag_At_u, label='Okompenserad', linestyle='--')
+    ax3.semilogx(f_hz, mag_At_c, label='Kompenserad (Butterworth-mål)')
+    ax3.axhline(20*np.log10(At_inf), color='black', linewidth=0.8, linestyle=':', label=r'Idealt $A_t^\infty$')
+    ax3.axhline(20*np.log10(At_inf) - 3, color='red', linewidth=0.8, linestyle=':', label='-3 dB Gräns')
+    ax3.set_title(r'Bode Amplitud: Sluten Förstärkning $A_t(s)$')
+    ax3.set_xlabel('Frekvens [Hz]')
+    ax3.set_ylabel('Amplitud [dB]')
+    ax3.grid(True, which="both", ls="-", alpha=0.5)
+    ax3.legend()
+
+# --- Stegsvar ---
+    t_vec = np.linspace(0, 0.0005, 1000) # 0.5 ms tidsfönster
+    t_u, y_u = signal.step(sys_At_u, T=t_vec)
+    t_c, y_c = signal.step(sys_At_c, T=t_vec)
+
+    ax4 = plt.subplot(2, 2, 4)
+    ax4.plot(t_u * 1e6, y_u, label='Okompenserad', linestyle='--')
+    ax4.plot(t_c * 1e6, y_c, label='Kompenserad')
+    ax4.axhline(At_inf, color='black', linewidth=0.8, linestyle=':', label='Slutvärde')
+    ax4.set_title('Stegsvar: Systemets Insvingning')
+    ax4.set_xlabel(r'Tid [$\mu$s]')
+    ax4.set_ylabel('Amplitud [A/A]')
+    ax4.grid(True)
+    ax4.legend()
+
+    plt.tight_layout()
+    plt.show()
+    
+
 def main():
     r_pi1 = 2 * r_pi_calc(B_f, I_C, V_T)
+    At_inf = 1 + R_2 / R_1
     AB_0 = value_AB_0(r_pi1, B_f, R_s, R_1, R_2)
     r_pi2 = r_pi_calc(B_f, 3e-3, V_T)
     P1 = P1_value(r_pi2, C_2)
     P2 = P2_value(r_pi1, R_1, R_2, R_s, C_1)
     LP, omega_0, pp1, pp2, sum_sling, sum_sys = butterwoth(AB_0, P1, P2)
+    P_ph = 1000
     print("_"*100)
     print(f"Beräknat värde för AB(0): {AB_0:.2f} \n")
     print(f"Beräknade sling poler:\nP1: {P1:.2f} \nP2: {P2:.2f}")
@@ -125,5 +207,6 @@ def main():
     rlocus(P1, P2, pp1, pp2)
     
     print("_"*100)
+    bode(AB_0, At_inf, P1, P2, P_ph)
 
 main()
