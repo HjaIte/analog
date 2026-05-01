@@ -1,2 +1,3 @@
 Kom ihåg att ladda ner python libs finns i requirements.txt:
 För att återskapa miljön kör: pip install -r requirements.txt
+Tips att använda ett virtual inviroment (venv)
