@@ -144,17 +144,19 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
     ax1.axhline(0, color='black', linewidth=0.8, linestyle=':')
     ax1.set_title(r'Bode Amplitud: Slingförstärkning $A\beta(s)$')
     ax1.set_ylabel('Amplitud [dB]')
+    ax1.set_xlabel('Frekvens [Hz]')
     ax1.grid(True, which="both", ls="-", alpha=0.5)
     ax1.legend()
 
     ax2 = plt.subplot(2, 2, 3)
     ax2.semilogx(f_hz, phase_u, label='Okompenserad', linestyle='--')
     ax2.semilogx(f_hz, phase_c, label='Kompenserad')
-    ax2.axhline(-180, color='red', linewidth=0.8, linestyle=':')
+    ax2.axhline(-180, color='red', linewidth=0.8, linestyle=':', label='-180° Gräns') 
     ax2.set_title(r'Bode Fas: Slingförstärkning $A\beta(s)$')
     ax2.set_xlabel('Frekvens [Hz]')
     ax2.set_ylabel('Fas [Grader]')
     ax2.grid(True, which="both", ls="-", alpha=0.5)
+    ax2.legend()
 
     # --- Bode-diagram: Sluten förstärkning At(s) ---
     w_At_u, mag_At_u, _ = signal.bode(sys_At_u, w=w_bode)
@@ -177,8 +179,8 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
     t_c, y_c = signal.step(sys_At_c, T=t_vec)
 
     ax4 = plt.subplot(2, 2, 4)
-    ax4.plot(t_u * 1e6, y_u, label='Okompenserad', linestyle='--')
-    ax4.plot(t_c * 1e6, y_c, label='Kompenserad')
+    ax4.plot(t_u, y_u, label='Okompenserad', linestyle='--')
+    ax4.plot(t_c, y_c, label='Kompenserad')
     ax4.axhline(At_inf, color='black', linewidth=0.8, linestyle=':', label='Slutvärde')
     ax4.set_title('Stegsvar: Systemets Insvingning')
     ax4.set_xlabel(r'Tid [$\mu$s]')
@@ -188,9 +190,6 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
 
     plt.tight_layout()
     plt.show()
-    print("--- OKOMPENSERAT SYSTEM ---")
-    print("Täljare:", sys_At_u.num)
-    print("Nämnare:", sys_At_u.den)
     
 
 def main():
