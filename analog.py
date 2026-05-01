@@ -109,6 +109,10 @@ def rlocus(P1, P2, pp1, pp2):
 
     #################### BODE_DIAGRAM #########################
 def bode(AB_0, At_inf, P1, P2, P_ph):
+    norm_factor = 1e6 #För att dela ned för att undvika RunTimeWaring
+    P1 = P1 / norm_factor
+    P2 = P2 / norm_factor
+    P_ph = P_ph / norm_factor
     #Överföringsfunktioner:
     K_uncomp = AB_0 * P1 * P2
     sys_Abeta_u = signal.ZerosPolesGain([], [-P1, -P2], K_uncomp).to_tf()
@@ -126,13 +130,13 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
     den_At_c = np.polyadd(sys_Abeta_c.den, sys_Abeta_c.num) #Nämnare
     sys_At_c = signal.TransferFunction(num_At_c, den_At_c) #Skapa funk med signal
 
-    w_bode = np.logspace(1, 7, 1000) * 2 * np.pi 
+    w_bode = np.logspace(1, 7, 1000) * 2 * np.pi / norm_factor
 
-    fig = plt.figure(figsize=(14, 10))
+    fig = plt.figure(figsize=(14, 8))
 
     w_u, mag_u, phase_u = signal.bode(sys_Abeta_u, w=w_bode)
     w_c, mag_c, phase_c = signal.bode(sys_Abeta_c, w=w_bode)
-    f_hz = w_u / (2 * np.pi)
+    f_hz = w_u * norm_factor / (2 * np.pi)
 
     ax1 = plt.subplot(2, 2, 1)
     ax1.semilogx(f_hz, mag_u, label='Okompenserad', linestyle='--')
@@ -188,13 +192,13 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
 
 def main():
     r_pi1 = 2 * r_pi_calc(B_f, I_C, V_T)
-    At_inf = 1 + R_2 / R_1
+    At_inf = 1 + R_2 / R_1 #Inte helt säker på detta
     AB_0 = value_AB_0(r_pi1, B_f, R_s, R_1, R_2)
     r_pi2 = r_pi_calc(B_f, 3e-3, V_T)
     P1 = P1_value(r_pi2, C_2)
     P2 = P2_value(r_pi1, R_1, R_2, R_s, C_1)
     LP, omega_0, pp1, pp2, sum_sling, sum_sys = butterwoth(AB_0, P1, P2)
-    P_ph = 1000
+    Z_ph = -491794.56
     print("_"*100)
     print(f"Beräknat värde för AB(0): {AB_0:.2f} \n")
     print(f"Beräknade sling poler:\nP1: {P1:.2f} \nP2: {P2:.2f}")
@@ -207,6 +211,6 @@ def main():
     rlocus(P1, P2, pp1, pp2)
     
     print("_"*100)
-    bode(AB_0, At_inf, P1, P2, P_ph)
+    bode(AB_0, At_inf, P1, P2, Z_ph)
 
 main()
