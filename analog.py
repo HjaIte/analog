@@ -224,8 +224,9 @@ def main():
         print("Icke-dominata poler ingår")
     print("_"*25, "Phantom-uträkningar", "_"*25)
     print(f"N_ph = {N_ph:.2e} rad/s")
-    print(f"C_ph = {C_ph:.2e} rad/s")
+    print(f"C_ph = {C_ph:.2e} F")
     print(f"Z_ph = {Z_ph:.2e} rad/s")
+    print(f"\u03B4 (effektivitet) = {Z_ph / N_ph :.1f}")
     print("_"*100)
     
     rlocus(P1, P2, pp1, pp2)
