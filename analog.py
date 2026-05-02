@@ -183,7 +183,7 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
     ax3.legend()
 
 # --- Stegsvar ---
-    t_vec = np.linspace(0, 1000, 1000) # 0.5 ms tidsfönster
+    t_vec = np.linspace(0, 500, 1000) # 0.5 ms tidsfönster
     t_u, y_u = signal.step(sys_At_u, T=t_vec)
     t_c, y_c = signal.step(sys_At_c, T=t_vec)
 
@@ -231,6 +231,6 @@ def main():
     rlocus(P1, P2, pp1, pp2)
     
     print("_"*100)
-    bode(-AB_0, At_inf, P1, P2, Z_ph)
+    bode(-AB_0, At_inf, P1, P2, N_ph)
 
 main()
