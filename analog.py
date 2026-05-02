@@ -35,6 +35,15 @@ def P1_value(r_pi2, C_2):
 def P2_value(r_pi1, R_1, R_2, R_s, C_1):
     return (-((R_1 + R_2)*(R_s + r_pi1) + R_s*r_pi1)/(R_s*r_pi1*(R_1 + R_s)*C_1))
 
+def Phantomzero(Omega_0, Pol1, Pol2):
+    return( - (Omega_0 * Omega_0) / ((np.sqrt(2)*Omega_0) + Pol1 + Pol2))
+
+def Phantompole(R_1, R_2, Cph):
+    return(- (R_1 + R_2) / (R_1 * R_2 * Cph))
+
+def PhantomKondensator(Nph, R2):
+    return(- 1 / (R2 * Nph))
+
 def butterwoth(AB_0, P1, P2):
     LP = abs((1 - AB_0 * P1 * P2))
     omega_0 = np.sqrt(LP)
@@ -200,7 +209,10 @@ def main():
     P1 = P1_value(r_pi2, C_2)
     P2 = P2_value(r_pi1, R_1, R_2, R_s, C_1)
     LP, omega_0, pp1, pp2, sum_sling, sum_sys = butterwoth(AB_0, P1, P2)
-    Z_ph = -491794.56
+    N_ph = Phantomzero(omega_0, P1, P2)
+    C_ph = PhantomKondensator(R_2, N_ph)
+    Z_ph = Phantompole(R_1, R_2, C_ph)
+
     print("_"*100)
     print(f"Beräknat värde för AB(0): {AB_0:.2f} \n")
     print(f"Beräknade sling poler:\nP1: {P1:.2f} \nP2: {P2:.2f}")
@@ -210,6 +222,12 @@ def main():
         print("=> Endast domminata poler ingår")
     else:
         print("Icke-dominata poler ingår")
+    print("_"*25, "Phantom-uträkningar", "_"*25)
+    print(f"N_ph = {N_ph:.2e} rad/s")
+    print(f"C_ph = {C_ph:.2e} rad/s")
+    print(f"Z_ph = {Z_ph:.2e} rad/s")
+    print("_"*100)
+    
     rlocus(P1, P2, pp1, pp2)
     
     print("_"*100)
