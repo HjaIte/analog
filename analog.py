@@ -54,7 +54,7 @@ def butterwoth(AB_0, P1, P2):
     return(LP, omega_0, pp1, pp2, sum_sling, sum_sys)
 
 def rlocus(P1, P2, pp1, pp2):
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 14))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
 
     #----------------------------ROOOT LOCUS UTNA FANTOMNOLLAN--------------------------
     radius = abs(2.11e+05)
@@ -73,15 +73,14 @@ def rlocus(P1, P2, pp1, pp2):
     ax1.plot([0, np.real(P1)], [0, np.imag(P1)], 'g:', linewidth=0.8, alpha=0.6)
     ax1.plot([0, np.real(P2)], [0, np.imag(P2)], 'g:', linewidth=0.8, alpha=0.6)
 
-    ax1.plot(np.real(P1), np.imag(P1), 'g*', markersize=14,
-            label=f"Butterworth target (K ≈ {K_required:.2f})")
-    ax1.plot(np.real(P2), np.imag(P2), 'g*', markersize=14)
+    ax1.plot(np.real(P1), np.imag(P1), 'X', markersize=14, color='blue', label='$p_1$')
+    ax1.plot(np.real(P2), np.imag(P2), 'X', markersize=14, color='blue', label='$p_2$')
 
-
+    ax1.legend()
     ax1.grid(True, linestyle='--')
     #-----------------------------------ROOT LOCUS FÖR FANTIOMNOLLAN-------------------------------
 
-    den = np.real(np.poly([pp1, pp2]))
+    den = np.real(np.poly([P1, P2]))
     nph = 144960.6
     phzero = [1/nph, 1]
     sys2 = ct.tf(phzero, den)
@@ -91,27 +90,29 @@ def rlocus(P1, P2, pp1, pp2):
     ct.root_locus_plot(sys2, ax=ax2)
 
     #plotta slingpolerna:
-
+    ax2.set_xlim([300000, 10000])
+    ax2.set_ylim([-200000, 200000])
+    ax2.set_aspect('equal', adjustable='datalim')
+    
     ax2.plot([0, np.real(P1)], [0, np.imag(P1)], 'g:', linewidth=0.8, alpha=0.6)
     ax2.plot([0, np.real(P2)], [0, np.imag(P2)], 'g:', linewidth=0.8, alpha=0.6)
 
-    ax2.plot(np.real(P1), np.imag(P1), 'g*', markersize=14,
-            label=f"Butterworth target (K ≈ {K_required:.2f})")
-    ax2.plot(np.real(P2), np.imag(P2), 'g*', markersize=14)
+    ax2.plot(np.real(P1), np.imag(P1), 'X', markersize=14, color='blue', label='$p_1$')
+    ax2.plot(np.real(P2), np.imag(P2), 'X', markersize=14, color='blue', label='$p_2$')
 
 
     #plotta systempolerna
-    ax2.plot(radius * np.cos(theta), radius * np.sin(theta), 
-            'b--', linewidth=1, alpha=0.5, label=f"ω₀ = {radius:.2e} rad/s")
+    ax2.plot(np.abs(pp1) * np.cos(theta), np.abs(pp1) * np.sin(theta), 
+            'b--', linewidth=1, alpha=0.5)
 
     ax2.plot([0, np.real(pp1)], [0, np.imag(pp1)], 'g:', linewidth=0.8, alpha=0.6)
     ax2.plot([0, np.real(pp2)], [0, np.imag(pp2)], 'g:', linewidth=0.8, alpha=0.6)
 
-    ax2.plot(np.real(pp1), np.imag(pp1), 'g*', markersize=14,
-            label=f"Butterworth target (K ≈ {K_required:.2f})")
-    ax2.plot(np.real(pp2), np.imag(pp2), 'g*', markersize=14)
+    ax2.plot(np.real(pp1), np.imag(pp1), 'X', markersize=14, color='red', label=f"$p'_1$")
+    ax2.plot(np.real(pp2), np.imag(pp2), 'X', markersize=14, color='red', label=f"$p'_1$")
 
     ax2.grid(True, linestyle='--')
+    ax2.legend()
     ax2.set_xlim([-3.25*10**5, 2000])
     plt.show()
 
