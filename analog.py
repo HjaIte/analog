@@ -81,7 +81,7 @@ def rlocus(P1, P2, pp1, pp2):
     #-----------------------------------ROOT LOCUS FÖR FANTIOMNOLLAN-------------------------------
 
     den = np.real(np.poly([P1, P2]))
-    nph = 144960.6
+    nph = 44708.6
     phzero = [1/nph, 1]
     sys2 = ct.tf(phzero, den)
 
@@ -90,8 +90,8 @@ def rlocus(P1, P2, pp1, pp2):
     ct.root_locus_plot(sys2, ax=ax2)
 
     #plotta slingpolerna:
-    ax2.set_xlim([300000, 10000])
-    ax2.set_ylim([-200000, 200000])
+    ax2.set_xlim([-100000, 100])
+    ax2.set_ylim([-150000, 100000])
     ax2.set_aspect('equal', adjustable='datalim')
     
     ax2.plot([0, np.real(P1)], [0, np.imag(P1)], 'g:', linewidth=0.8, alpha=0.6)
