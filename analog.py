@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import control as ct
 import scipy.signal as signal
+import pandas as pd
 
 #Komponeter:
 B_f = 200
@@ -201,6 +202,7 @@ def bode(AB_0, At_inf, P1, P2, P_ph):
     plt.tight_layout()
     plt.show()
     
+
 
 def main():
     r_pi1 = 2 * r_pi_calc(B_f, I_C, V_T)
