@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import control as ct
 import scipy.signal as signal
-import pandas as pd
+
 
 #Komponeter:
 B_f = 200

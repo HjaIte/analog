@@ -9,7 +9,7 @@ AmpKomp_volt = np.log10(AmpKomp_volt) * 20
 AmpOkomp_volt = np.log10(AmpOkomp_volt) * 20
 
 Hz = np.array([1e3, 5e3, 7e3, 8e3, 10e3, 12e3, 16e3, 25e3, 50e3])
-fasKomp_deg = -np.array([1.29, 60, 85, 95, 100, 120, 130, 200, 220]) #vid höda frekvenser estimerades värdena
+fasKomp_deg = -np.array([1.29, 60, 85, 95, 100, 120, 130, 200, 220]) #vid höga frekvenser estimerades värdena
 fasOkomp_deg = -np.array([2, 20, 120, 140, 160, 160, 170, 180, 180])
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 8))
